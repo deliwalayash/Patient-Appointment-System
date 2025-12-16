@@ -5,8 +5,9 @@ import Home from './components/Home'
 import Navbar from './components/Navbar'
 import Form from './components/Form'
 import Bookappointment from './components/Bookappointment'
-import Viewappintment from './components/Viewappintment'
+
 import Editform from './components/Editform'
+import Viewappointment from './components/Viewappointment'
 
 const App = () => {
   return (
@@ -17,7 +18,7 @@ const App = () => {
    <Route path='/' element={<Home></Home>}></Route>
    <Route path='/book-app' element={<Bookappointment></Bookappointment>}></Route>
    <Route path='/book-app/:id' element={<Form></Form>}></Route>
-   <Route path='/viewappointment' element={<Viewappintment></Viewappintment>}></Route>
+   <Route path='/viewappointment' element={<Viewappointment></Viewappointment>}></Route>
    <Route path='/edit-form/:id' element={<Editform></Editform>}></Route>
    </Routes>
    </BrowserRouter>

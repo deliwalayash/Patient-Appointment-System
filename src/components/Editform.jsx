@@ -1,93 +1,181 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import doctors from './doctors'
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Editform = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-    const navigate=useNavigate()
-    const {id}=useParams()
-    const [patient,setPatient]=useState({
-          name:"",
-          age:"",
-          date:"",
-          mobilenumber:"",
-          problem:"",
-          doctorname:""
-        })
+  const [patients, setPatients] = useState(
+    JSON.parse(localStorage.getItem("patients")) || []
+  );
 
-    const [patients,setPatients]=useState(JSON.parse(localStorage.getItem('patients')) || [])
+  const [patient, setPatient] = useState({
+    name: "",
+    age: "",
+    date: "",
+    mobilenumber: "",
+    problem: "",
+    doctorname: "",
+  });
 
-    const foundpatient=patients.find((curEle)=>{
-      return curEle.id == id
-    })
+  // ✅ Load selected patient
+  useEffect(() => {
+    const found = patients.find(
+      (p) => p.id === Number(id)
+    );
 
-     const handleChange=(e)=>{
-      setPatient({...patient,[e.target.id]:e.target.value})
+    if (found) {
+      setPatient(found);
     }
+  }, [id, patients]);
 
-    useEffect(()=>{
-      setPatient(foundpatient)
-    },[])
+  const handleChange = (e) => {
+    setPatient({
+      ...patient,
+      [e.target.id]: e.target.value,
+    });
+  };
 
-    
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    const handleSubmit=(e)=>{
-      e.preventDefault()
+    const updatedPatients = patients.map((p) =>
+      p.id === Number(id) ? patient : p
+    );
 
-      const upDatedpatient={
-        id:Number(id),
-        ...patient
-      }
+    setPatients(updatedPatients);
+    localStorage.setItem(
+      "patients",
+      JSON.stringify(updatedPatients)
+    );
 
-      const newPatientslist=patients.map((curEle)=>{
-        return curEle.id==id ? upDatedpatient : curEle
-      })
+    navigate("/viewappointment");
+  };
 
-      console.log(newPatientslist)
-      setPatients(newPatientslist)
-      // localStorage.setItem("patients",JSON.stringify(patients))
-
-       navigate('/viewappointment')
-    }
-
-    useEffect(()=>{
-    localStorage.setItem("patients",JSON.stringify(patients))
-    })
-
+  // 🧠 Guard UI if patient not found
+  if (!patient.name) {
+    return (
+      <div className="text-center mt-20 text-gray-600">
+        Loading patient details...
+      </div>
+    );
+  }
 
   return (
-    <div>
-   <form className="max-w-sm mx-auto" onSubmit={handleSubmit} >
- {/* <h1 className='text-black text-3xl'>{id}</h1> */}
-  <div className="mb-5">
-    <label htmlFor="text" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Patient Name</label>
-    <input type="text" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@flowbite.com" required onChange={handleChange} value={patient.name}/>
-  </div>
-  <div className="mb-5">
-    <label htmlFor="age" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Patient Age</label>
-    <input type="number" id="age" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required onChange={handleChange} value={patient.age} />
-  </div>
-  <div className="mb-5">
-    <label htmlFor="date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Appointment Date</label>
-    <input type="date" id="date" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required onChange={handleChange} value={patient.date}/>
-  </div>
-  <div className="mb-5">
-    <label htmlFor="mobilenumber" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mobile Number</label>
-    <input type="number" id="mobilenumber" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required onChange={handleChange} value={patient.mobilenumber}/>
-  </div>
-  <div className="mb-5">
-    <label htmlFor="problem" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Problems</label>
-    <input type="text" id="problem" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={handleChange} required value={patient.problem} />
-  </div>
-  <div className="mb-5">
-    <label htmlFor="doctorname" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Doctors Name</label>
-    <input id="doctorname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={handleChange} required  value={patient.doctorname} disabled/>
-  </div>
+    <div className="max-w-xl mx-auto mt-16 bg-white shadow-xl rounded-2xl p-8">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        Edit Appointment
+      </h2>
 
-  <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" >Submit</button>
-</form>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Patient Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Patient Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={patient.name}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Age */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Age
+          </label>
+          <input
+            type="number"
+            id="age"
+            value={patient.age}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Appointment Date
+          </label>
+          <input
+            type="date"
+            id="date"
+            value={patient.date}
+            min={new Date().toISOString().split("T")[0]}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Mobile */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Mobile Number
+          </label>
+          <input
+            type="number"
+            id="mobilenumber"
+            value={patient.mobilenumber}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Problem */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Problem
+          </label>
+          <textarea
+            id="problem"
+            value={patient.problem}
+            onChange={handleChange}
+            required
+            rows="3"
+            className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Doctor (readonly) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Doctor
+          </label>
+          <input
+            value={patient.doctorname}
+            disabled
+            className="w-full rounded-lg border bg-gray-100 px-4 py-2"
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex gap-4 pt-4">
+          <button
+            type="submit"
+            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Update Appointment
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/viewappointment")}
+            className="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
-  )
-}
+  );
+};
 
-export default Editform
+export default Editform;
